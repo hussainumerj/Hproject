@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}{{ action }} Meeting | Sky Portal{% endblock %}
+{% block page_heading %}{{ action }} Meeting{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+
+        <div class="panel-card">
+            <div class="card-body">
+
+                <div class="mb-4">
+                    <h2 class="sky-section-title mb-1">{{ action }} Meeting</h2>
+                    <p class="page-subtitle">Fill in the details below to {{ action|lower }} a meeting.</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="sky-form-label">Meeting Title</label>
+                        <input
+                            type="text"
+                            name="title"
+                            value="{{ form.title.value|default:'' }}"
+                            class="form-control sky-search-input"
+                            placeholder="e.g. Sprint Planning, Team Sync"
+                            style="border-radius: 16px;"
+                        >
+                        {% if form.title.errors %}
+                        <div class="sky-field-error mt-1">{{ form.title.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="sky-form-label">Description</label>
+                        <textarea
+                            name="description"
+                            class="form-control sky-textarea"
+                            placeholder="What is this meeting about?"
+                        >{{ form.description.value|default:'' }}</textarea>
+                        {% if form.description.errors %}
+                        <div class="sky-field-error mt-1">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="sky-form-label">Platform</label>
+                            <select name="platform" class="form-select sky-select" style="border-radius:16px;">
+                                <option value="zoom"      {% if form.platform.value == 'zoom'      %}selected{% endif %}>Zoom</option>
+                                <option value="teams"     {% if form.platform.value == 'teams'     %}selected{% endif %}>Microsoft Teams</option>
+                                <option value="meet"      {% if form.platform.value == 'meet'      %}selected{% endif %}>Google Meet</option>
+                                <option value="slack"     {% if form.platform.value == 'slack'     %}selected{% endif %}>Slack</option>
+                                <option value="in_person" {% if form.platform.value == 'in_person' %}selected{% endif %}>In Person</option>
+                            </select>
+                            {% if form.platform.errors %}
+                            <div class="sky-field-error mt-1">{{ form.platform.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="sky-form-label">Date & Time</label>
+                            <input
+                                type="datetime-local"
+                                name="date_time"
+                                value="{{ form.date_time.value|default:'' }}"
+                                class="form-control"
+                                style="min-height:58px; border-radius:16px; border:1px solid var(--border); font-size:15px;"
+                            >
+                            {% if form.date_time.errors %}
+                            <div class="sky-field-error mt-1">{{ form.date_time.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="sky-form-label">Meeting Link <span style="color:var(--muted); font-weight:400;">(optional)</span></label>
+                        <input
+                            type="url"
+                            name="meeting_link"
+                            value="{{ form.meeting_link.value|default:'' }}"
+                            class="form-control sky-search-input"
+                            placeholder="https://zoom.us/j/..."
+                            style="border-radius: 16px;"
+                        >
+                        {% if form.meeting_link.errors %}
+                        <div class="sky-field-error mt-1">{{ form.meeting_link.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-3 pt-2">
+                        <button type="submit" class="btn-sky-primary" style="text-decoration:none; min-height:54px; padding:0 32px; border-radius:100px; font-weight:700; font-size:16px; display:inline-flex; align-items:center; background:var(--primary); color:#fff; border:none; cursor:pointer;">
+                            Save Meeting
+                        </button>
+                        <a href="{% url 'schedule_home' %}" class="btn-sky-secondary" style="text-decoration:none; min-height:54px; padding:0 28px; border-radius:100px; font-weight:700; font-size:16px; display:inline-flex; align-items:center; background:#fff; border:1px solid var(--border); color:var(--text);">
+                            Cancel
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.sky-form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+.sky-field-error {
+    font-size: 13px;
+    color: #c0392b;
+    font-weight: 500;
+}
+</style>
+
+{% endblock %}

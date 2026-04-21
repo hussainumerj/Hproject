@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Email {{ team.name }} | Sky Portal{% endblock %}
+{% block nav_teams %}active{% endblock %}
+{% block page_heading %}Email Team{% endblock %}
+
+{% block content %}
+
+<div class="mb-2">
+    <a href="{% url 'team_detail' team.id %}" class="btn btn-sky-secondary">← Back to Team</a>
+</div>
+
+<div class="panel-card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-4 mb-4">
+            <div>
+                <h2 class="page-title mb-1" style="font-size: 2.2rem;">Email {{ team.name }}</h2>
+                <p class="page-subtitle mb-0">Send a message to the team contact</p>
+            </div>
+
+            <span class="sky-badge sky-badge-active">
+                {% if team.email %}
+                    Ready
+                {% else %}
+                    No Email
+                {% endif %}
+            </span>
+        </div>
+
+        {% if success %}
+            <div class="alert alert-success rounded-4 mb-4">
+                Email sent successfully.
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="alert alert-danger rounded-4 mb-4">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <form method="post" onsubmit="return confirmEmailSend()">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">To</label>
+                        <input
+                            type="text"
+                            class="form-control sky-search-input"
+                            value="{{ team.email|default:'No email available' }}"
+                            disabled
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Subject</label>
+                        <input
+                            type="text"
+                            name="subject"
+                            class="form-control sky-search-input"
+                            placeholder="Enter subject"
+                            value="{{ subject|default:'' }}"
+                            required
+                        >
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Message</label>
+                        <textarea
+                            name="message"
+                            rows="8"
+                            class="form-control sky-textarea"
+                            placeholder="Write your message..."
+                            required
+                        >{{ message|default:'' }}</textarea>
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" class="btn btn-sky-primary">Send Email</button>
+                        <a href="{% url 'team_detail' team.id %}" class="btn btn-sky-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="panel-card">
+                    <div class="card-body">
+                        <h3 class="sky-section-title">Contact Summary</h3>
+
+                        <ul class="sky-meta-list mb-0">
+                            <li><strong>Team:</strong> {{ team.name }}</li>
+                            <li><strong>Manager:</strong> {{ team.manager.username|default:"No manager assigned" }}</li>
+                            <li><strong>Email:</strong> {{ team.email|default:"No email available" }}</li>
+                            <li><strong>Slack:</strong> {{ team.slack_channel|default:"No slack channel available" }}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="panel-card mt-4">
+                    <div class="card-body">
+                        <h3 class="sky-section-title">Note</h3>
+                        <p class="page-subtitle mb-0">
+                            In development, sent emails will appear in the terminal because the project is using Django’s console email backend.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmEmailSend() {
+    return confirm("Send this message to the team contact?");
+}
+</script>
+
+{% endblock %}

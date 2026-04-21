@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Sky Portal{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+{% block page_heading %}Welcome, {{ user.first_name|default:user.username }}!{% endblock %}
+
+{% block content %}
+
+<div class="panel-card">
+    <div class="card-body">
+        <form method="get" action="{% url 'team_list' %}">
+            <input
+                type="text"
+                name="q"
+                class="form-control sky-search-input"
+                placeholder="Search teams..."
+            >
+        </form>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="panel-card quick-action-card">
+            <div class="card-body">
+                <div class="quick-action-title mb-2">Find a Team</div>
+                <p class="page-subtitle mb-3">Browse all engineering teams in the portal.</p>
+                <a href="{% url 'team_list' %}" class="btn btn-sky-primary">Open Teams</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel-card quick-action-card">
+            <div class="card-body">
+                <div class="quick-action-title mb-2">View Profile</div>
+                <p class="page-subtitle mb-3">Manage your account details and password.</p>
+                <a href="{% url 'profile' %}" class="btn btn-sky-secondary">My Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel-card quick-action-card">
+            <div class="card-body">
+                <div class="quick-action-title mb-2">Contact Teams</div>
+                <p class="page-subtitle mb-3">Quickly jump to team contacts and communication pages.</p>
+                <a href="{% url 'team_list' %}" class="btn btn-sky-outline">View Directory</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="panel-card">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; color: var(--primary);">
+                    {{ team_count }}
+                </h2>
+                <p class="page-subtitle mb-0">Teams</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel-card">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; color: var(--primary);">
+                    {{ member_count }}
+                </h2>
+                <p class="page-subtitle mb-0">Members</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel-card">
+            <div class="card-body text-center">
+                <h2 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 8px; color: var(--primary);">
+                    {{ repo_count }}
+                </h2>
+                <p class="page-subtitle mb-0">Repositories</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="pt-2">
+    <h2 class="sky-section-title mb-4">Recent Teams</h2>
+
+    <div class="row g-4">
+        {% for team in recent_teams %}
+            <div class="col-lg-4 col-md-6">
+                <div class="panel-card h-100">
+                    <div class="card-body">
+                        <h3 class="quick-action-title mb-2">{{ team.name }}</h3>
+                        <p class="page-subtitle mb-3">
+                            {{ team.manager.username|default:"No manager assigned" }}
+                        </p>
+
+                        <div class="d-flex gap-2 mb-3">
+                            <div class="top-shell-avatar" style="width: 42px; height: 42px;"></div>
+                            <div class="top-shell-avatar" style="width: 42px; height: 42px;"></div>
+                            <div class="top-shell-avatar" style="width: 42px; height: 42px;"></div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <span class="sky-badge sky-badge-active">{{ team.get_status_display }}</span>
+                            <a href="{% url 'team_detail' team.id %}" class="btn btn-sky-secondary">
+                                View Team
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="panel-card">
+                    <div class="card-body">
+                        <p class="sky-empty">No teams available yet.</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

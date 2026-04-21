@@ -1,0 +1,66 @@
+{% extends "auth_base.html" %}
+{% block title %}Login | Sky Portal{% endblock %}
+
+{% block content %}
+
+<div class="auth-page">
+
+    <div class="auth-card">
+
+        <div class="auth-logo">
+            <div class="auth-logo-icon">☰</div>
+        </div>
+
+        <h2 class="auth-title">Sky Portal</h2>
+        <p class="auth-subtitle">Engineering Team Directory</p>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+
+            <div class="auth-group">
+                <label>Username</label>
+                <div class="auth-input-wrapper">
+                    <input type="text" name="username" placeholder="Enter your username" required>
+                </div>
+            </div>
+
+            <div class="auth-group">
+                <label>Password</label>
+                <div class="auth-input-wrapper">
+                    <input type="password" name="password" id="passwordInput" placeholder="••••••••" required>
+                    <span class="auth-toggle" onclick="togglePassword()">👁</span>
+                </div>
+            </div>
+
+            <div class="auth-options">
+                <label><input type="checkbox"> Remember me</label>
+                <a href="{% url 'password_reset' %}" class="auth-link">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="auth-btn">Sign In</button>
+
+        </form>
+
+        <div class="auth-divider"><span>Or continue with</span></div>
+
+        <div class="auth-socials">
+            <button type="button" class="auth-social-btn">Google</button>
+            <button type="button" class="auth-social-btn">Facebook</button>
+        </div>
+
+        <div class="auth-footer">
+            <a href="{% url 'signup' %}">Create an account</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function togglePassword() {
+    const input = document.getElementById("passwordInput");
+    input.type = input.type === "password" ? "text" : "password";
+}
+</script>
+
+{% endblock %}

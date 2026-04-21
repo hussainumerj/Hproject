@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Schedule Meeting | {{ team.name }} | Sky Portal{% endblock %}
+{% block nav_teams %}active{% endblock %}
+{% block page_heading %}Schedule Meeting{% endblock %}
+
+{% block content %}
+
+<div class="mb-2">
+    <a href="{% url 'team_detail' team.id %}" class="btn btn-sky-secondary">← Back to Team</a>
+</div>
+
+<div class="panel-card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-4 mb-4">
+            <div>
+                <h2 class="page-title mb-1" style="font-size: 2.2rem;">Schedule Meeting</h2>
+                <p class="page-subtitle mb-0">
+                    Arrange a meeting request for {{ team.name }}
+                </p>
+            </div>
+
+            <span class="sky-badge sky-badge-active">Meeting Request</span>
+        </div>
+
+        {% if success_message %}
+            <div class="alert alert-success rounded-4 mb-4">
+                {{ success_message }}
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="alert alert-danger rounded-4 mb-4">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <form method="post" onsubmit="return confirmSchedule()">
+                    {% csrf_token %}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Meeting Title</label>
+                            <input
+                                type="text"
+                                name="title"
+                                class="form-control sky-search-input"
+                                placeholder="Enter meeting title"
+                                value="{{ submitted_data.title|default:'' }}"
+                                required
+                            >
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Date</label>
+                            <input
+                                type="date"
+                                name="meeting_date"
+                                class="form-control sky-search-input"
+                                value="{{ submitted_data.meeting_date|default:'' }}"
+                                required
+                            >
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Time</label>
+                            <input
+                                type="time"
+                                name="meeting_time"
+                                class="form-control sky-search-input"
+                                value="{{ submitted_data.meeting_time|default:'' }}"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Platform</label>
+                            <select name="platform" class="form-select sky-select" required>
+                                <option value="">Select platform</option>
+                                <option value="Microsoft Teams" {% if submitted_data.platform == "Microsoft Teams" %}selected{% endif %}>Microsoft Teams</option>
+                                <option value="Zoom" {% if submitted_data.platform == "Zoom" %}selected{% endif %}>Zoom</option>
+                                <option value="Google Meet" {% if submitted_data.platform == "Google Meet" %}selected{% endif %}>Google Meet</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Team Contact</label>
+                            <input
+                                type="text"
+                                class="form-control sky-search-input"
+                                value="{{ team.email|default:'No email available' }}"
+                                disabled
+                            >
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Invite Members</label>
+                        <div class="panel-card">
+                            <div class="card-body">
+                                {% if members %}
+                                    <div class="row g-3">
+                                        {% for member in members %}
+                                            <div class="col-md-6">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <input
+                                                        class="form-check-input mt-0"
+                                                        type="checkbox"
+                                                        name="members"
+                                                        value="{{ member.id }}"
+                                                        id="member{{ member.id }}"
+                                                        {% if submitted_data.selected_members and member.id|stringformat:"s" in submitted_data.selected_members %}checked{% endif %}
+                                                    >
+                                                    <label class="form-check-label d-flex align-items-center gap-3 mb-0" for="member{{ member.id }}">
+                                                        <div class="top-shell-avatar" style="width: 42px; height: 42px;"></div>
+                                                        <div>
+                                                            <div style="font-weight: 700;">{{ member.username }}</div>
+                                                            <div class="page-subtitle">{{ member.email|default:"No email available" }}</div>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="sky-empty">No team members available.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Message / Notes</label>
+                        <textarea
+                            name="message"
+                            rows="6"
+                            class="form-control sky-textarea"
+                            placeholder="Add meeting notes, goals, or agenda..."
+                        >{{ submitted_data.message|default:'' }}</textarea>
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <button type="submit" class="btn btn-sky-primary">Submit Meeting Request</button>
+                        <a href="{% url 'team_detail' team.id %}" class="btn btn-sky-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="panel-card">
+                    <div class="card-body">
+                        <h3 class="sky-section-title">Team Summary</h3>
+                        <ul class="sky-meta-list mb-0">
+                            <li><strong>Team:</strong> {{ team.name }}</li>
+                            <li><strong>Manager:</strong> {{ team.manager.username|default:"No manager assigned" }}</li>
+                            <li><strong>Department:</strong> {{ team.department.name|default:"No department assigned" }}</li>
+                            <li><strong>Members:</strong> {{ members|length }}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                {% if submitted_data %}
+                    <div class="panel-card mt-4">
+                        <div class="card-body">
+                            <h3 class="sky-section-title">Submitted Details</h3>
+
+                            <ul class="sky-meta-list mb-0">
+                                <li><strong>Title:</strong> {{ submitted_data.title }}</li>
+                                <li><strong>Date:</strong> {{ submitted_data.meeting_date }}</li>
+                                <li><strong>Time:</strong> {{ submitted_data.meeting_time }}</li>
+                                <li><strong>Platform:</strong> {{ submitted_data.platform }}</li>
+                                <li>
+                                    <strong>Members:</strong>
+                                    {% if submitted_data.selected_usernames %}
+                                        {{ submitted_data.selected_usernames|join:", " }}
+                                    {% else %}
+                                        None selected
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmSchedule() {
+    return confirm("Submit this meeting request?");
+}
+</script>
+
+{% endblock %}
